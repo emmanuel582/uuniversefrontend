@@ -10,10 +10,13 @@ const Campaigns = () => {
     const [formData, setFormData] = useState({
         id: '',
         name: '',
+        business_name: '',
+        agent_name: '',
+        call_purpose: '',
         agent_id: '',
         from_number: '',
         calendly_event_uri: '',
-        calendly_token: '' // New field for per-campaign token
+        calendly_token: ''
     });
 
     useEffect(() => {
@@ -35,7 +38,7 @@ const Campaigns = () => {
             await axios.post(`${API_URL}/api/campaigns`, formData);
             setIsEditing(false);
             fetchCampaigns();
-            setFormData({ id: '', name: '', agent_id: '', from_number: '', calendly_event_uri: '', calendly_token: '' });
+            setFormData({ id: '', name: '', business_name: '', agent_name: '', call_purpose: '', agent_id: '', from_number: '', calendly_event_uri: '', calendly_token: '' });
         } catch (err) {
             alert('Error saving campaign: ' + (err.response?.data?.error || err.message));
         }
@@ -76,6 +79,38 @@ const Campaigns = () => {
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="e.g. Q1 Sales Outreach"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Business Name *</label>
+                            <input
+                                required
+                                className="w-full p-2 border border-slate-300 rounded block"
+                                value={formData.business_name}
+                                onChange={e => setFormData({ ...formData, business_name: e.target.value })}
+                                placeholder="e.g. ABC Corporation"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Agent will say: "I'm calling from [this name]"</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Agent Name *</label>
+                            <input
+                                required
+                                className="w-full p-2 border border-slate-300 rounded block"
+                                value={formData.agent_name}
+                                onChange={e => setFormData({ ...formData, agent_name: e.target.value })}
+                                placeholder="e.g. Sarah, Mike, Jacob"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Agent will say: "Hi, this is [this name] calling from..."</p>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Call Purpose</label>
+                            <input
+                                className="w-full p-2 border border-slate-300 rounded block"
+                                value={formData.call_purpose}
+                                onChange={e => setFormData({ ...formData, call_purpose: e.target.value })}
+                                placeholder="e.g. to discuss how we can help grow your business"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Agent will say: "I'm calling [this purpose]"</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Retell Agent ID</label>
@@ -152,7 +187,10 @@ const Campaigns = () => {
                         </div>
 
                         <div className="space-y-2 text-sm text-slate-600">
-                            <p><span className="font-medium text-slate-900">Agent:</span> {c.agent_id.substr(0, 12)}...</p>
+                            <p><span className="font-medium text-slate-900">Business:</span> {c.business_name || 'Not set'}</p>
+                            <p><span className="font-medium text-slate-900">Agent Name:</span> {c.agent_name || 'Sarah'}</p>
+                            <p><span className="font-medium text-slate-900">Purpose:</span> {c.call_purpose || 'Not set'}</p>
+                            <p><span className="font-medium text-slate-900">Agent ID:</span> {c.agent_id?.substr(0, 12)}...</p>
                             <p><span className="font-medium text-slate-900">Phone:</span> {c.from_number}</p>
                             <p className="truncate"><span className="font-medium text-slate-900">Calendly:</span> {c.calendly_event_uri.split('/').pop()}</p>
                             {c.calendly_token && <p className="text-xs text-emerald-600 font-medium">Custom Token Active</p>}
