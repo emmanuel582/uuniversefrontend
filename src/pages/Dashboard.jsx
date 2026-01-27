@@ -58,7 +58,7 @@ const TestCallForm = () => {
 };
 
 const Dashboard = () => {
-    const [stats, setStats] = useState({ total: 0, queued: 0, failed: 0, recent: [] });
+    const [stats, setStats] = useState({ total: 0, queued: 0, completed: 0, failed: 0, dialed: 0, recent: [] });
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -75,25 +75,47 @@ const Dashboard = () => {
         return () => clearInterval(interval);
     }, []);
 
+    // Status badge color helper
+    const getStatusColor = (status, type, outcome) => {
+        if (outcome || type === 'call_outcome') {
+            if (status?.includes('Booked') || outcome?.includes('Booked')) return 'bg-emerald-100 text-emerald-700';
+            if (status === 'Call Back' || outcome === 'Call Back') return 'bg-amber-100 text-amber-700';
+            if (status === 'Not Interested' || outcome === 'Not Interested') return 'bg-slate-100 text-slate-600';
+            if (status === 'Opt-Out' || outcome === 'Opt-Out') return 'bg-red-100 text-red-700';
+            return 'bg-purple-100 text-purple-700';
+        }
+        if (status === 'QUEUED') return 'bg-blue-100 text-blue-700';
+        if (status === 'SENT') return 'bg-emerald-100 text-emerald-700';
+        if (status === 'SUPPRESSED') return 'bg-yellow-100 text-yellow-700';
+        if (status?.includes('FAILED') || status?.includes('SKIPPED')) return 'bg-red-100 text-red-700';
+        return 'bg-slate-100 text-slate-600';
+    };
+
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <StatCard
-                    label="Total Logs"
-                    value={stats.total}
+                    label="Total Calls"
+                    value={stats.dialed || stats.total}
                     icon={Users}
                     color="bg-indigo-500"
                 />
                 <StatCard
-                    label="Queued Calls"
+                    label="In Progress"
                     value={stats.queued}
                     icon={Phone}
                     color="bg-blue-500"
                 />
                 <StatCard
-                    label="Failed/Errors"
-                    value={stats.failed}
+                    label="Completed"
+                    value={stats.completed}
                     icon={CalendarCheck}
+                    color="bg-emerald-500"
+                />
+                <StatCard
+                    label="Failed"
+                    value={stats.failed}
+                    icon={ArrowUpRight}
                     color="bg-red-500"
                 />
             </div>
@@ -106,7 +128,7 @@ const Dashboard = () => {
                             onClick={async () => {
                                 if (confirm('Are you sure you want to clear all call logs?')) {
                                     await axios.delete(`${API_URL}/api/stats`);
-                                    setStats({ total: 0, queued: 0, failed: 0, recent: [] });
+                                    setStats({ total: 0, queued: 0, completed: 0, failed: 0, dialed: 0, recent: [] });
                                 }
                             }}
                             className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
@@ -114,27 +136,34 @@ const Dashboard = () => {
                             Clear Logs
                         </button>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
                         {stats.recent.length === 0 && <p className="text-slate-500">No activity logged.</p>}
                         {stats.recent.map((log) => (
                             <div key={log.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
-                                        {log.first_name ? log.first_name[0] : '?'}
+                                        {(log.first_name || log.customer_name || log.name || '?')[0]}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-slate-900">{log.first_name} {log.last_name}</p>
-                                        <p className="text-sm text-slate-500">{log.phone}</p>
+                                        <p className="font-medium text-slate-900">
+                                            {log.customer_name || log.first_name || log.name || 'Unknown'}
+                                            {log.last_name ? ` ${log.last_name}` : ''}
+                                        </p>
+                                        <p className="text-sm text-slate-500">
+                                            {log.phone || log.customer_phone || log.email || log.customer_email || 'No contact'}
+                                        </p>
+                                        {log.campaign_id && (
+                                            <p className="text-xs text-slate-400 font-mono">{log.campaign_id}</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-sm font-medium px-2 py-1 rounded ${log.status === 'QUEUED' ? 'bg-blue-100 text-blue-700' :
-                                        log.status === 'SUPPRESSED' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'
-                                        }`}>
-                                        {log.status}
+                                    <span className={`text-sm font-medium px-2 py-1 rounded ${getStatusColor(log.status, log.type, log.outcome)}`}>
+                                        {log.outcome || log.status || log.type || 'Unknown'}
                                     </span>
-                                    <p className="text-xs text-slate-400 mt-1">{new Date(log.timestamp).toLocaleTimeString()}</p>
+                                    <p className="text-xs text-slate-400 mt-1">
+                                        {new Date(log.timestamp).toLocaleString()}
+                                    </p>
                                 </div>
                             </div>
                         ))}

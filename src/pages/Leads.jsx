@@ -87,15 +87,22 @@ const Leads = () => {
                         >
                             {campaigns.map((campaign) => (
                                 <option key={campaign.id} value={campaign.id}>
-                                    {campaign.name} ({campaign.business_name || 'No business name'})
+                                    [{campaign.id}] {campaign.name} - {campaign.business_name || 'No business name'}
                                 </option>
                             ))}
                         </select>
                     )}
                     {selectedCampaign && campaigns.find(c => c.id === selectedCampaign) && (
-                        <p className="mt-2 text-xs text-slate-500 text-left">
-                            Agent will introduce as: <strong>{campaigns.find(c => c.id === selectedCampaign)?.business_name}</strong>
-                        </p>
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg text-left">
+                            <p className="text-xs text-blue-600 font-medium mb-1">Selected Campaign Details:</p>
+                            <p className="text-sm text-slate-700">
+                                <span className="font-mono text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded mr-2">{selectedCampaign}</span>
+                                Agent will introduce as: <strong>{campaigns.find(c => c.id === selectedCampaign)?.agent_name || 'Sarah'}</strong> from <strong>{campaigns.find(c => c.id === selectedCampaign)?.business_name}</strong>
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                                If your CSV has a <code className="bg-slate-100 px-1 rounded">campaign_id</code> column, it will override this selection per row.
+                            </p>
+                        </div>
                     )}
                 </div>
 
@@ -127,9 +134,14 @@ const Leads = () => {
                 )}
 
                 {status === 'done' && (
-                    <div className="mt-4 p-4 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center gap-2">
-                        <CheckCircle size={20} />
-                        <span>Upload successful! Campaign has been queued.</span>
+                    <div className="mt-4 p-4 bg-emerald-50 text-emerald-700 rounded-lg">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <CheckCircle size={20} />
+                            <span className="font-medium">Upload successful!</span>
+                        </div>
+                        <p className="text-sm text-center">
+                            Leads queued for campaign: <span className="font-mono bg-emerald-100 px-2 py-0.5 rounded">{selectedCampaign}</span>
+                        </p>
                     </div>
                 )}
 
