@@ -13,6 +13,8 @@ const Campaigns = () => {
         business_name: '',
         agent_name: '',
         call_purpose: '',
+        campaign_summary: '',
+        qualifying_questions: '',
         agent_id: '',
         from_number: '',
         calendly_event_uri: '',
@@ -38,7 +40,7 @@ const Campaigns = () => {
             await axios.post(`${API_URL}/api/campaigns`, formData);
             setIsEditing(false);
             fetchCampaigns();
-            setFormData({ id: '', name: '', business_name: '', agent_name: '', call_purpose: '', agent_id: '', from_number: '', calendly_event_uri: '', calendly_token: '' });
+            setFormData({ id: '', name: '', business_name: '', agent_name: '', call_purpose: '', campaign_summary: '', qualifying_questions: '', agent_id: '', from_number: '', calendly_event_uri: '', calendly_token: '' });
         } catch (err) {
             alert('Error saving campaign: ' + (err.response?.data?.error || err.message));
         }
@@ -111,6 +113,33 @@ const Campaigns = () => {
                                 placeholder="e.g. to discuss how we can help grow your business"
                             />
                             <p className="text-xs text-slate-500 mt-1">Agent will say: "I'm calling [this purpose]"</p>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Campaign Summary *</label>
+                            <textarea
+                                required
+                                className="w-full p-2 border border-slate-300 rounded block resize-none"
+                                rows={3}
+                                value={formData.campaign_summary}
+                                onChange={e => setFormData({ ...formData, campaign_summary: e.target.value })}
+                                placeholder="e.g. We help commercial real estate owners with financing solutions and insurance coverage. I'm reaching out to see if you have any upcoming needs."
+                            />
+                            <p className="text-xs text-slate-500 mt-1">A 1-2 sentence pitch explaining why you are calling.</p>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Qualifying Questions *</label>
+                            <textarea
+                                required
+                                className="w-full p-2 border border-slate-300 rounded block resize-none"
+                                rows={4}
+                                value={formData.qualifying_questions}
+                                onChange={e => setFormData({ ...formData, qualifying_questions: e.target.value })}
+                                placeholder="Enter each question on a new line, e.g.:
+Have you ever worked with us before?
+Do you have any upcoming financing needs in the next 60-90 days?
+What's the best email to send more information to?"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Questions the agent should ask. Enter each question on a new line.</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Retell Agent ID</label>
@@ -190,6 +219,12 @@ const Campaigns = () => {
                             <p><span className="font-medium text-slate-900">Business:</span> {c.business_name || 'Not set'}</p>
                             <p><span className="font-medium text-slate-900">Agent Name:</span> {c.agent_name || 'Sarah'}</p>
                             <p><span className="font-medium text-slate-900">Purpose:</span> {c.call_purpose || 'Not set'}</p>
+                            {c.campaign_summary && <p className="truncate"><span className="font-medium text-slate-900">Summary:</span> {c.campaign_summary}</p>}
+                            {c.qualifying_questions && (
+                                <p className="text-xs text-blue-600 font-medium">
+                                    {Array.isArray(c.qualifying_questions) ? c.qualifying_questions.length : c.qualifying_questions.split('\n').filter(q => q.trim()).length} Qualifying Questions
+                                </p>
+                            )}
                             <p><span className="font-medium text-slate-900">Agent ID:</span> {c.agent_id?.substr(0, 12)}...</p>
                             <p><span className="font-medium text-slate-900">Phone:</span> {c.from_number}</p>
                             <p className="truncate"><span className="font-medium text-slate-900">Calendly:</span> {c.calendly_event_uri.split('/').pop()}</p>
