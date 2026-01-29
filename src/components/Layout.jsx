@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { LayoutDashboard, Phone, Users, FileText, Settings, Bot } from 'lucide-react';
+import { LayoutDashboard, Phone, Users, FileText, Settings, Bot, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, onLogout }) => {
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -12,6 +12,12 @@ const Layout = ({ children }) => {
         { label: 'Campaigns', path: '/campaigns', icon: Phone },
         { label: 'Lead Lists', path: '/leads', icon: Users },
     ];
+
+    const handleLogout = () => {
+        if (window.confirm('Are you sure you want to logout?')) {
+            onLogout && onLogout();
+        }
+    };
 
     return (
         <div className="flex h-screen bg-slate-50">
@@ -51,6 +57,17 @@ const Layout = ({ children }) => {
                         );
                     })}
                 </nav>
+
+                {/* Logout Button */}
+                <div className="p-4 border-t border-slate-100">
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-red-600 hover:bg-red-50 w-full"
+                    >
+                        <LogOut size={20} />
+                        {isSidebarOpen && <span>Logout</span>}
+                    </button>
+                </div>
             </aside>
 
             {/* Main Content */}
@@ -60,7 +77,12 @@ const Layout = ({ children }) => {
                         {navItems.find(i => i.path === location.pathname)?.label || 'Dashboard'}
                     </h1>
                     <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200" />
+                        <span className="text-sm text-slate-500">
+                            {localStorage.getItem('auth_user') || 'Admin'}
+                        </span>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
+                            {(localStorage.getItem('auth_user') || 'A')[0].toUpperCase()}
+                        </div>
                     </div>
                 </header>
 
