@@ -30,6 +30,7 @@ const Campaigns = () => {
     const fetchCampaigns = async () => {
         try {
             const res = await axios.get(`${API_URL}/api/campaigns`);
+            console.log("Fetched campaigns:", res.data); // DEBUG: Check console for exact data
             setCampaigns(res.data);
         } catch (err) {
             console.error(err);
@@ -330,7 +331,7 @@ What's the best email to send more information to?"
                             <p><span className="font-medium text-slate-900">Phone:</span> {c.from_number}</p>
                             <p className="truncate"><span className="font-medium text-slate-900">Calendly:</span> {c.calendly_event_uri?.split('/').pop()}</p>
                             {c.calendly_token && <p className="text-xs text-emerald-600 font-medium">Custom Token Active</p>}
-                            <p className="truncate"><span className="font-medium text-slate-900">Notify:</span> {c.notification_email || 'Not set'}</p>
+                            <p className="truncate"><span className="font-medium text-slate-900">Internal Notif:</span> {c.notification_email || 'Not set'}</p>
                         </div>
                     </div>
                 ))}
