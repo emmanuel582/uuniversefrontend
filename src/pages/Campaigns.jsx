@@ -71,7 +71,7 @@ const Campaigns = () => {
             business_name: campaign.business_name || '',
             agent_name: campaign.agent_name || '',
             call_purpose: campaign.call_purpose || '',
-            campaign_summary: campaign.campaign_summary || '',
+            campaign_summary: campaign.campaign_summary || campaign.email_summary || '',
             qualifying_questions: questionsStr,
             agent_id: campaign.agent_id || '',
             from_number: campaign.from_number || '',
@@ -193,7 +193,6 @@ const Campaigns = () => {
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-slate-700 mb-1">Campaign Summary *</label>
                             <textarea
-                                required
                                 className="w-full p-2 border border-slate-300 rounded block resize-none"
                                 rows={3}
                                 value={formData.campaign_summary}
