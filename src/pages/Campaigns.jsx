@@ -19,7 +19,8 @@ const Campaigns = () => {
         agent_id: '',
         from_number: '',
         calendly_event_uri: '',
-        calendly_token: ''
+        calendly_token: '',
+        notification_email: ''
     });
 
     useEffect(() => {
@@ -47,7 +48,8 @@ const Campaigns = () => {
             agent_id: '',
             from_number: '',
             calendly_event_uri: '',
-            calendly_token: ''
+            calendly_token: '',
+            notification_email: ''
         });
         setEditingCampaignId(null);
         setIsEditing(false);
@@ -73,7 +75,8 @@ const Campaigns = () => {
             agent_id: campaign.agent_id || '',
             from_number: campaign.from_number || '',
             calendly_event_uri: campaign.calendly_event_uri || '',
-            calendly_token: campaign.calendly_token || ''
+            calendly_token: campaign.calendly_token || '',
+            notification_email: campaign.notification_email || ''
         });
         setEditingCampaignId(campaign.id);
         setIsEditing(true);
@@ -255,6 +258,19 @@ What's the best email to send more information to?"
                             <p className="text-xs text-slate-500 mt-1">Leave blank to use the server default token.</p>
                         </div>
 
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Notification Email *</label>
+                            <input
+                                required
+                                type="email"
+                                className="w-full p-2 border border-slate-300 rounded block"
+                                value={formData.notification_email}
+                                onChange={e => setFormData({ ...formData, notification_email: e.target.value })}
+                                placeholder="team-member@example.com"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Internal email to notify when a lead requests information.</p>
+                        </div>
+
                         <div className="md:col-span-2 flex justify-end gap-2 mt-2">
                             <button
                                 type="button"
@@ -314,6 +330,7 @@ What's the best email to send more information to?"
                             <p><span className="font-medium text-slate-900">Phone:</span> {c.from_number}</p>
                             <p className="truncate"><span className="font-medium text-slate-900">Calendly:</span> {c.calendly_event_uri?.split('/').pop()}</p>
                             {c.calendly_token && <p className="text-xs text-emerald-600 font-medium">Custom Token Active</p>}
+                            <p className="truncate"><span className="font-medium text-slate-900">Notify:</span> {c.notification_email || 'Not set'}</p>
                         </div>
                     </div>
                 ))}
